@@ -217,6 +217,55 @@ cross-platform dev loop. The insider-threat and accidental-dev risks
 are both foreclosed by guard #4: you can't produce a verifiable
 sealed artifact from a dev-tainted workspace.
 
+## End-to-end example
+
+On Windows, macOS, or Linux-without-SELinux, you can run the full
+`new` → `scope` lifecycle against the bundled sample scope. This
+exercises every code path except `seal` (which requires a GPG
+signing key) and LUKS mount/unmount (which requires Fedora). See
+[`examples/scope-sample.json`](examples/scope-sample.json) for a
+realistic scope file demonstrating every field, including the
+structured `ScopeNote` annotations that document *why* each
+out-of-scope entry is excluded.
+
+```bash
+# One-time setup (see Install below)
+python -m pip install -e 'engage/tricorne-engage[test]'
+
+# Dev mode requires BOTH --dev flag and the environment variable.
+# This is the two-key activation that prevents accidental dev mode
+# in a real engagement shell.
+export TRICORNE_DEV_MODE=1   # Linux/macOS
+# PowerShell: $env:TRICORNE_DEV_MODE = "1"
+
+# Create a new engagement workspace under ~/engagements/
+tricorne-engage new acme-webapp-2026 --dev
+
+# Load the sample scope; its SHA-256 and in/out-of-scope counts
+# are recorded in the hash-chained engagement log.
+tricorne-engage scope \
+    engage/tricorne-engage/examples/scope-sample.json \
+    -e acme-webapp-2026 \
+    --dev
+
+# Inspect what was loaded (rich-rendered tables of in/out-of-scope).
+tricorne-engage scope -e acme-webapp-2026 --dev
+
+# Peek at the hash-chained log — JSON Lines, one entry per line.
+cat ~/engagements/acme-webapp-2026/engagement.log
+# Second entry's prev_hash == SHA-256 of first entry's canonical bytes.
+```
+
+Each command prints the red `DEV MODE ACTIVE` banner on `stderr`.
+Every log entry carries `"mode":"dev"`. Because of that, if you
+attempt `tricorne-engage seal -e acme-webapp-2026 --confirm --dev`,
+the seal will correctly refuse with a `SealError` — that's the
+dev-taint gate doing its job. Live-mode seals require a Tricorne
+or compatible Fedora system with SELinux enforcing and a configured
+GPG signing key.
+
+To reset after experimenting: `rm -rf ~/engagements/acme-webapp-2026`.
+
 ## Install (dev)
 
 ```bash

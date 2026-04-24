@@ -23,7 +23,7 @@ jobs:
     container:
       image: registry.fedoraproject.org/fedora:latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Install selinux-policy-devel
         run: dnf install -y --setopt=install_weak_deps=False selinux-policy-devel make findutils
       - name: Compile every module

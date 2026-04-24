@@ -29,7 +29,7 @@ jobs:
       specs: ${{ steps.find.outputs.specs }}
       any: ${{ steps.find.outputs.any }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - id: find
         name: Enumerate specs under packaging/ and metapackages/
         run: |
@@ -53,7 +53,7 @@ jobs:
       matrix:
         spec: ${{ fromJson(needs.discover.outputs.specs) }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Install rpmlint
         run: dnf install -y --setopt=install_weak_deps=False rpmlint
       - name: Lint ${{ matrix.spec }}
@@ -72,7 +72,7 @@ jobs:
       matrix:
         spec: ${{ fromJson(needs.discover.outputs.specs) }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Install build tooling
         run: dnf install -y --setopt=install_weak_deps=False mock rpm-build rpmdevtools
       - name: Build ${{ matrix.spec }}
