@@ -25,9 +25,9 @@ SPDX-License-Identifier: CC-BY-SA-4.0
 
 ## The short version
 
-Kali owns Debian. BlackArch owns Arch. Parrot owns the "security-focused desktop" niche. **No one owns RPM-world offensive security** — even though Fedora is arguably the most defensively hardened mainstream distribution. Tricorne fills that gap.
+Kali owns Debian. BlackArch owns Arch. Parrot owns the "security-focused desktop" niche. **No one owns RPM-world offensive security**, even though Fedora is arguably the most defensively hardened mainstream distribution. Tricorne fills that gap.
 
-It ships the offensive security toolchain (recon, web, wireless, exploitation, forensics, RE) on top of Fedora's defaults — **SELinux enforcing, audit framework on, sVirt active** — and adds an engagement-workflow layer that no other offensive distribution ships.
+It ships the offensive security toolchain (recon, web, wireless, exploitation, forensics, RE) on top of Fedora's defaults of **SELinux enforcing, audit framework on, sVirt active** and adds an engagement-workflow layer that no other offensive distribution ships.
 
 ## Three corners
 
