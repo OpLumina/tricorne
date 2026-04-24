@@ -1,0 +1,17 @@
+# SPDX-FileCopyrightText: 2026 Thread & Signal LLC
+# SPDX-License-Identifier: CC-BY-SA-4.0
+#
+# REUSE Specification v3 annotations for files that cannot easily carry
+# inline SPDX headers (JSON, binary assets, etc.). See:
+#   https://reuse.software/spec/
+
+version = 1
+
+# Example scope files and any other example payloads under engage/.
+# These are templates for operator use; they travel with the engage
+# package and share its Apache-2.0 license.
+[[annotations]]
+path = "engage/tricorne-engage/examples/**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 Thread & Signal LLC"
+SPDX-License-Identifier = "Apache-2.0"
