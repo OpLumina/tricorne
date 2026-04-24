@@ -8,7 +8,6 @@
 * nslookup
 * phoneinfoga
 * Sherlock
-* 
 
 
 ## Scanning:
@@ -34,6 +33,10 @@
 * john
 * hashcat
 
+
+## SIGINT
+* Kismet
+* aircrack-ng
 
 ## Misc/Custom:
 ---
