@@ -1,7 +1,5 @@
 # General Tools
----
 ## Passive Recon
----
 * shodan-api tool of some sort
 * subfinder
 * sublist3r
@@ -10,7 +8,6 @@
 * phoneinfoga
 * Sherlock
 ## Scanning:
----
 **Web Recon:**
 * gospider
 * nmap
@@ -19,7 +16,6 @@
 * wpscan
 * spiderfoot
 ## File analysis:
----
 **Metadata/Text analysis:**
 * Exiftool (Phil Harvey)
 * tesseract
@@ -31,18 +27,16 @@
 
 
 ## SIGINT
----
 * Kismet
 * aircrack-ng
 
 ## Misc/Custom:
----
 * Cyberchef
 * 
 # Mobile App Testing
----
+
 ## Android:
----
+
 * jadx
 * adb
 * apktool
@@ -51,4 +45,4 @@
 * baksmali
 * androguard
 ## IOS:
----
+
