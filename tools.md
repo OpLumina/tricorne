@@ -1,4 +1,5 @@
 # General Tools
+---
 ## Passive Recon
 ---
 * shodan-api tool of some sort
@@ -8,8 +9,6 @@
 * nslookup
 * phoneinfoga
 * Sherlock
-
-
 ## Scanning:
 ---
 **Web Recon:**
@@ -19,8 +18,6 @@
 * ffuf
 * wpscan
 * spiderfoot
-
-
 ## File analysis:
 ---
 **Metadata/Text analysis:**
@@ -28,13 +25,13 @@
 * tesseract
 * Trufflehog
 
-
 **Password Cracking:**
 * john
 * hashcat
 
 
 ## SIGINT
+---
 * Kismet
 * aircrack-ng
 
@@ -42,8 +39,6 @@
 ---
 * Cyberchef
 * 
-
-
 # Mobile App Testing
 ---
 ## Android:
@@ -55,5 +50,5 @@
 * jd-cli
 * baksmali
 * androguard
-
 ## IOS:
+---
