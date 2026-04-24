@@ -1,0 +1,17 @@
+# SPDX-FileCopyrightText: 2026 Thread & Signal LLC
+# SPDX-License-Identifier: GPL-2.0-or-later
+#
+# tricorne file contexts. Maps paths on disk to SELinux types.
+
+# Tricorne-authored entry points. Running any of these binaries
+# triggers the transition from the caller's domain into tricorne_t.
+/usr/bin/tricorne-shell                --  gen_context(system_u:object_r:tricorne_exec_t,s0)
+/usr/bin/tricorne-engage               --  gen_context(system_u:object_r:tricorne_exec_t,s0)
+/usr/bin/tricorne-report               --  gen_context(system_u:object_r:tricorne_exec_t,s0)
+/usr/libexec/tricorne(/.*)?             gen_context(system_u:object_r:tricorne_exec_t,s0)
+
+# Per-operator engagement workspaces.
+HOME_DIR/engagements(/.*)?              gen_context(system_u:object_r:tricorne_home_t,s0)
+
+# Scratch space under /var/tmp.
+/var/tmp/tricorne(/.*)?                 gen_context(system_u:object_r:tricorne_tmp_t,s0)

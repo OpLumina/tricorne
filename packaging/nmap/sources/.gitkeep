@@ -1,0 +1,8 @@
+# This directory holds upstream source tarballs referenced by `Source0:`
+# in tricorne-nmap.spec. Tarballs themselves are .gitignored (see
+# repo-root .gitignore, "RPM build artifacts"). This file exists to
+# track the empty directory in git.
+#
+# When building locally:
+#   curl -L -o sources/tricorne-0.1.0.tar.gz \
+#       https://github.com/crussella0129/tricorne/archive/v0.1.0.tar.gz

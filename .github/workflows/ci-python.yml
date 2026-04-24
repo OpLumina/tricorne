@@ -1,0 +1,46 @@
+# SPDX-FileCopyrightText: 2026 Thread & Signal LLC
+# SPDX-License-Identifier: MIT
+#
+# Purple Corner Python tests. Runs on the supported Fedora Python
+# matrix (currently 3.11 through 3.13 inclusive).
+
+name: Purple Corner tests
+
+on:
+  pull_request:
+    paths:
+      - "engage/**"
+      - ".github/workflows/ci-python.yml"
+  push:
+    branches: [main]
+    paths:
+      - "engage/**"
+
+jobs:
+  test:
+    name: pytest (py${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install engage/ (if present)
+        run: |
+          if [ -f engage/tricorne-engage/pyproject.toml ] ; then
+            python -m pip install --upgrade pip
+            python -m pip install -e 'engage/tricorne-engage[test]'
+          else
+            echo "engage/tricorne-engage/ has no pyproject.toml yet — skipping install"
+          fi
+      - name: Run tests
+        run: |
+          if find engage -name 'test_*.py' -print -quit | grep -q . ; then
+            python -m pytest engage/ -v
+          else
+            echo "No tests yet — Purple Corner MVP lands in a separate PR"
+          fi
