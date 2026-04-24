@@ -20,9 +20,6 @@ SPDX-License-Identifier: CC-BY-SA-4.0
 
 ---
 
-> *"My treasure? If you want it, I'll let you have it. Seek it out! I left everything at that place!"*
-> — Gol D. Roger
-
 ## The short version
 
 Kali owns Debian. BlackArch owns Arch. Parrot owns the "security-focused desktop" niche. **No one owns RPM-world offensive security**, even though Fedora is arguably the most defensively hardened mainstream distribution. Tricorne fills that gap.
