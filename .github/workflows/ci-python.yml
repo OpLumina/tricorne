@@ -3,18 +3,21 @@
 #
 # Purple Corner Python tests. Runs on the supported Fedora Python
 # matrix (currently 3.11 through 3.13 inclusive).
+#
+# Deliberately unfiltered by `paths:` — this is the always-runs smoke
+# job. Every push to main, and every pull request, executes pytest.
+# The suite runs in well under a second, so there is no "skip for
+# doc-only changes" savings worth having, and keeping it always-on
+# means every HEAD state is actually verified rather than silently
+# unchecked. Heavy workflows (ci-rpm.yml mockbuild, ci-selinux.yml,
+# any future ISO smoke test) keep their path filters.
 
 name: Purple Corner tests
 
 on:
   pull_request:
-    paths:
-      - "engage/**"
-      - ".github/workflows/ci-python.yml"
   push:
     branches: [main]
-    paths:
-      - "engage/**"
 
 jobs:
   test:
