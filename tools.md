@@ -25,8 +25,10 @@
 * john
 * hashcat
 
-
-## SIGINT
+## Exploitation:
+* metasploit
+* hydra
+## SIGINT:
 * Kismet
 * aircrack-ng
 
