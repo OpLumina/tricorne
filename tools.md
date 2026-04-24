@@ -22,7 +22,8 @@
 * spiderfoot
 
 
-## File analysis
+## File analysis:
+---
 **Metadata/Text analysis:**
 * Exiftool (Phil Harvey)
 * tesseract
@@ -35,5 +36,21 @@
 
 
 ## Misc/Custom:
+---
 * Cyberchef
 * 
+
+
+# Mobile App Testing
+---
+## Android:
+---
+* jadx
+* adb
+* apktool
+* dex2jar
+* jd-cli
+* baksmali
+* androguard
+
+## IOS:
