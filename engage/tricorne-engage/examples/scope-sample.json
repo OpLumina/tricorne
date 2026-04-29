@@ -1,0 +1,50 @@
+{
+  "engagement": "acme-webapp-2026",
+  "client": "Acme Corporation",
+  "authorized_from": "2026-04-25T09:00:00+00:00",
+  "authorized_to": "2026-05-09T17:00:00+00:00",
+  "in_scope_cidr": [
+    "203.0.113.0/24",
+    "2001:db8::/32"
+  ],
+  "in_scope_hosts": [
+    "*.webapp.acme.example",
+    "api.acme.example"
+  ],
+  "in_scope_urls": [
+    "api.acme.example/v1/*",
+    "webapp.acme.example/*"
+  ],
+  "out_of_scope_cidr": [
+    "203.0.113.10/32"
+  ],
+  "out_of_scope_hosts": [
+    "vpn.acme.example",
+    "corpvpn.acme.example"
+  ],
+  "out_of_scope_urls": [
+    "api.acme.example/v1/payments/*"
+  ],
+  "notes": {
+    "entries": [
+      {
+        "ts": "2026-04-24T14:00:00+00:00",
+        "author": "crussella0129@gmail.com",
+        "text": "Acme CSO confirmed 203.0.113.10 is the CEO's workstation and must remain out of scope for the duration of the engagement.",
+        "refs": ["203.0.113.10/32"]
+      },
+      {
+        "ts": "2026-04-24T14:05:00+00:00",
+        "author": "crussella0129@gmail.com",
+        "text": "Payments endpoints are excluded per PCI scope separation; test environment is available on a separate engagement.",
+        "refs": ["api.acme.example/v1/payments/*"]
+      },
+      {
+        "ts": "2026-04-24T14:15:00+00:00",
+        "author": "crussella0129@gmail.com",
+        "text": "Engagement window aligns with Acme's scheduled maintenance to minimize blue-team confusion during the active test phase.",
+        "refs": []
+      }
+    ]
+  }
+}

@@ -1,0 +1,21 @@
+# SPDX-FileCopyrightText: 2026 Thread & Signal LLC
+# SPDX-License-Identifier: MIT
+#
+# Verify every file declares a license via SPDX header or REUSE.toml,
+# per the REUSE specification v3 (https://reuse.software/spec/).
+
+name: REUSE compliance
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  reuse:
+    name: reuse lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: REUSE lint
+        uses: fsfe/reuse-action@v4

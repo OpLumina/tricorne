@@ -1,0 +1,145 @@
+# SPDX-FileCopyrightText: 2026 Thread & Signal LLC
+# SPDX-License-Identifier: GPL-2.0-or-later
+#
+# tricorne_t — base SELinux domain for Tricorne operator tools.
+#
+# This module defines the tricorne_t domain and the supporting types
+# tricorne_exec_t, tricorne_tmp_t, tricorne_home_t. Tools that run
+# inside tricorne_t gain elevated network capabilities (raw sockets,
+# packet crafting, promiscuous capture) while remaining constrained
+# from reading arbitrary home directories, /etc/shadow, and system
+# config.
+#
+# This is policy v0.0.1. It is expected to evolve as we collect AVC
+# denials from real tool runs. Do not treat this as final.
+
+policy_module(tricorne, 0.0.1)
+
+########################################
+#
+# Declarations
+#
+
+# The operator tool domain. Processes in this domain perform offensive
+# security operations (recon, exploitation, evidence capture).
+type tricorne_t;
+type tricorne_exec_t;
+
+# Make tricorne_t an application domain that transitions on exec of
+# tricorne_exec_t. The transition is explicit; users do not silently
+# elevate — they must run a binary labelled tricorne_exec_t.
+application_domain(tricorne_t, tricorne_exec_t)
+
+# Scratch space for transient artifacts (exploit development,
+# temporary captures). Separate from operator HOME and from
+# engagement workspaces.
+type tricorne_tmp_t;
+files_tmp_file(tricorne_tmp_t)
+
+# Operator-owned engagement workspaces. Each client engagement lives
+# under ~/engagements/<client>/ and starts as tricorne_home_t; a
+# separate tricorne_engagement_t module (forthcoming) elevates the
+# per-engagement subdirectories with additional audit hooks.
+type tricorne_home_t;
+userdom_user_home_content(tricorne_home_t)
+
+########################################
+#
+# Tunables (booleans)
+#
+# Narrow, per-capability toggles so locked-down deployments can disable
+# individual privileges without flipping the whole domain to permissive.
+
+## <desc>
+##   <p>
+##   Allow tricorne_t to create raw ICMP, UDP, and TCP sockets for
+##   packet crafting (nmap SYN scans, ping sweeps, custom probes).
+##   </p>
+## </desc>
+gen_tunable(tricorne_raw_socket, true)
+
+## <desc>
+##   <p>
+##   Allow tricorne_t to enter promiscuous mode on network interfaces
+##   for traffic capture (tcpdump, wireshark, bettercap sniff).
+##   </p>
+## </desc>
+gen_tunable(tricorne_promisc_capture, true)
+
+## <desc>
+##   <p>
+##   Allow tricorne_t to ptrace other user-owned processes for
+##   post-exploitation simulation and memory inspection. Off by
+##   default; enable per-engagement when needed.
+##   </p>
+## </desc>
+gen_tunable(tricorne_proc_introspect, false)
+
+########################################
+#
+# tricorne_t local policy
+#
+
+# Baseline capabilities every operator tool needs.
+allow tricorne_t self:process { signal_perms setcap };
+allow tricorne_t self:fifo_file rw_fifo_file_perms;
+allow tricorne_t self:unix_stream_socket create_stream_socket_perms;
+allow tricorne_t self:unix_dgram_socket create_socket_perms;
+
+# Raw sockets for packet crafting, boolean-gated.
+tunable_policy(`tricorne_raw_socket',`
+    allow tricorne_t self:capability { net_raw net_admin };
+    allow tricorne_t self:rawip_socket create_socket_perms;
+    allow tricorne_t self:packet_socket create_socket_perms;
+')
+
+# Promiscuous mode for capture tools, boolean-gated.
+tunable_policy(`tricorne_promisc_capture',`
+    allow tricorne_t self:capability { net_raw net_admin };
+    allow tricorne_t self:packet_socket { setopt getopt };
+')
+
+# Non-system process introspection for red-team simulation.
+# v0.0.1: only grants the capability. `userdom_ptrace_user_domains` is
+# NOT a refpolicy interface that exists in Fedora's selinux-policy; the
+# correct move once we have real denials is either an explicit
+# `allow tricorne_t <target_type>:process ptrace;` against specific user
+# domains (unpriv_userdomain, user_t), or `userdom_ptrace_unpriv_users`
+# if that interface is still present on the target refpolicy version.
+tunable_policy(`tricorne_proc_introspect',`
+    allow tricorne_t self:capability { sys_ptrace };
+')
+
+# Standard network access: TCP/UDP client sockets.
+corenet_tcp_connect_all_ports(tricorne_t)
+corenet_udp_bind_all_unreserved_ports(tricorne_t)
+corenet_tcp_bind_all_unreserved_ports(tricorne_t)
+
+# DNS resolution (every tool does this).
+sysnet_dns_name_resolve(tricorne_t)
+
+# Operator HOME (engagement workspaces).
+userdom_manage_user_home_content_files(tricorne_t)
+userdom_manage_user_home_content_dirs(tricorne_t)
+
+# Scratch space.
+files_manage_generic_tmp_files(tricorne_t)
+files_manage_generic_tmp_dirs(tricorne_t)
+
+# Logging to audit for engagement trail.
+logging_send_audit_msgs(tricorne_t)
+
+# Read standard system config needed to function (resolv.conf,
+# nsswitch.conf, /etc/services, /etc/protocols).
+miscfiles_read_generic_certs(tricorne_t)
+files_read_etc_files(tricorne_t)
+
+########################################
+#
+# Explicit dontaudit — things we actively deny but don't want
+# flooding the audit log from every scan.
+#
+
+# Operator tools should never read shadow. auth_* interfaces define
+# the shadow-access domains; we reassert silence here for readability.
+auth_dontaudit_read_shadow(tricorne_t)

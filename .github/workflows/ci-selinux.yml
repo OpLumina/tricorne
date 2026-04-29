@@ -1,0 +1,52 @@
+# SPDX-FileCopyrightText: 2026 Thread & Signal LLC
+# SPDX-License-Identifier: MIT
+#
+# Compile every SELinux policy module under selinux/ and fail the
+# build if any module fails to compile.
+
+name: SELinux policy compile
+
+on:
+  pull_request:
+    paths:
+      - "selinux/**"
+      - ".github/workflows/ci-selinux.yml"
+  push:
+    branches: [main]
+    paths:
+      - "selinux/**"
+
+jobs:
+  compile:
+    name: checkmodule + semodule_package
+    runs-on: ubuntu-latest
+    container:
+      image: registry.fedoraproject.org/fedora:latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install selinux-policy-devel
+        run: dnf install -y --setopt=install_weak_deps=False selinux-policy-devel make findutils
+      - name: Compile every module
+        run: |
+          set -e
+          failed=0
+          for dir in selinux/*/ ; do
+            [ -d "$dir" ] || continue
+            # Module source filename convention: first *.te found in
+            # the module directory names the module.
+            te=$(find "$dir" -maxdepth 1 -name '*.te' | head -n1 || true)
+            if [ -z "$te" ] ; then
+              echo "skip: $dir (no *.te)"
+              continue
+            fi
+            name=$(basename "$te" .te)
+            echo "::group::Compiling $name (from $dir)"
+            if ( cd "$dir" && make -f /usr/share/selinux/devel/Makefile "${name}.pp" ) ; then
+              echo "::endgroup::"
+            else
+              echo "::endgroup::"
+              echo "::error::module $name failed to compile"
+              failed=1
+            fi
+          done
+          exit $failed

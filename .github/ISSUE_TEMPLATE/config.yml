@@ -1,0 +1,14 @@
+# SPDX-FileCopyrightText: 2026 Thread & Signal LLC
+# SPDX-License-Identifier: MIT
+
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability (private report)
+    url: https://github.com/crussella0129/tricorne/blob/main/SECURITY.md
+    about: Report vulnerabilities privately per SECURITY.md — not in a public issue.
+  - name: General discussion
+    url: https://github.com/crussella0129/tricorne/discussions
+    about: Ideas, questions, and policy debate go in Discussions, not issues.
+  - name: Code of Conduct concerns
+    url: https://github.com/crussella0129/tricorne/blob/main/CODE_OF_CONDUCT.md
+    about: See CODE_OF_CONDUCT.md for the reporting process.

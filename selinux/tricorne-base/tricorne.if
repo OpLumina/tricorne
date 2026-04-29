@@ -1,0 +1,100 @@
+# SPDX-FileCopyrightText: 2026 Thread & Signal LLC
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+## <summary>Tricorne operator tooling base policy.</summary>
+## <desc>
+##    <p>
+##    The tricorne module defines the tricorne_t domain and supporting
+##    types that bundle offensive-security tooling into a constrained,
+##    auditable namespace distinct from operator HOME at large.
+##    </p>
+##    <p>
+##    Other policy modules (per-tool modules like nmap_tricorne,
+##    per-engagement modules like tricorne_engagement) call the
+##    interfaces defined here to integrate with the tricorne_t domain.
+##    </p>
+## </desc>
+
+########################################
+## <summary>
+##    Execute a tricorne_exec_t binary and transition into tricorne_t.
+## </summary>
+## <param name="domain">
+##    <summary>
+##    Domain allowed to transition.
+##    </summary>
+## </param>
+#
+interface(`tricorne_domtrans',`
+    gen_require(`
+        type tricorne_t, tricorne_exec_t;
+    ')
+
+    domtrans_pattern($1, tricorne_exec_t, tricorne_t)
+')
+
+########################################
+## <summary>
+##    Execute a tricorne_exec_t binary and transition via the user's role.
+##    Use from role-transition rules in per-user type templates.
+## </summary>
+## <param name="role">
+##    <summary>
+##    Role allowed the transition.
+##    </summary>
+## </param>
+## <param name="domain">
+##    <summary>
+##    Domain allowed the transition.
+##    </summary>
+## </param>
+#
+interface(`tricorne_role_transition',`
+    gen_require(`
+        type tricorne_t, tricorne_exec_t;
+    ')
+
+    role_transition $1 tricorne_exec_t system_r;
+    allow $1 tricorne_t:process { signal_perms };
+    tricorne_domtrans($2)
+')
+
+########################################
+## <summary>
+##    Allow a domain to read tricorne engagement workspace files.
+##    Typically only evidence collectors and report generators need this.
+## </summary>
+## <param name="domain">
+##    <summary>
+##    Domain allowed to read.
+##    </summary>
+## </param>
+#
+interface(`tricorne_read_engagement_files',`
+    gen_require(`
+        type tricorne_home_t;
+    ')
+
+    read_files_pattern($1, tricorne_home_t, tricorne_home_t)
+    list_dirs_pattern($1, tricorne_home_t, tricorne_home_t)
+')
+
+########################################
+## <summary>
+##    Allow a domain to manage tricorne scratch files under /var/tmp.
+## </summary>
+## <param name="domain">
+##    <summary>
+##    Domain allowed to manage.
+##    </summary>
+## </param>
+#
+interface(`tricorne_manage_tmp_files',`
+    gen_require(`
+        type tricorne_tmp_t;
+    ')
+
+    files_search_tmp($1)
+    manage_files_pattern($1, tricorne_tmp_t, tricorne_tmp_t)
+    manage_dirs_pattern($1, tricorne_tmp_t, tricorne_tmp_t)
+')

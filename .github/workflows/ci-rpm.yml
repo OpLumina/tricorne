@@ -1,0 +1,87 @@
+# SPDX-FileCopyrightText: 2026 Thread & Signal LLC
+# SPDX-License-Identifier: MIT
+#
+# Lint and build affected RPM specs in mock.
+#
+# Scaffolding stub — uses `continue-on-error` on mockbuild until we
+# have known-good specs. Remove that flag once `packaging/nmap/` and
+# the first metapackage are validated end-to-end.
+
+name: RPM build
+
+on:
+  pull_request:
+    paths:
+      - "packaging/**"
+      - "metapackages/**"
+      - ".github/workflows/ci-rpm.yml"
+  push:
+    branches: [main]
+    paths:
+      - "packaging/**"
+      - "metapackages/**"
+
+jobs:
+  discover:
+    name: Find spec files
+    runs-on: ubuntu-latest
+    outputs:
+      specs: ${{ steps.find.outputs.specs }}
+      any: ${{ steps.find.outputs.any }}
+    steps:
+      - uses: actions/checkout@v5
+      - id: find
+        name: Enumerate specs under packaging/ and metapackages/
+        run: |
+          specs=$(find packaging metapackages -type f -name '*.spec' 2>/dev/null | sort -u | jq -R -s -c 'split("\n") | map(select(length > 0))')
+          echo "specs=$specs" >> "$GITHUB_OUTPUT"
+          if [ "$specs" = "[]" ] ; then
+            echo "any=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "any=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  rpmlint:
+    name: rpmlint
+    needs: discover
+    if: needs.discover.outputs.any == 'true'
+    runs-on: ubuntu-latest
+    container:
+      image: registry.fedoraproject.org/fedora:latest
+    strategy:
+      fail-fast: false
+      matrix:
+        spec: ${{ fromJson(needs.discover.outputs.specs) }}
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install rpmlint
+        run: dnf install -y --setopt=install_weak_deps=False rpmlint
+      - name: Lint ${{ matrix.spec }}
+        run: rpmlint "${{ matrix.spec }}"
+
+  mockbuild:
+    name: mock build
+    needs: discover
+    if: needs.discover.outputs.any == 'true'
+    runs-on: ubuntu-latest
+    container:
+      image: registry.fedoraproject.org/fedora:latest
+      options: --privileged
+    strategy:
+      fail-fast: false
+      matrix:
+        spec: ${{ fromJson(needs.discover.outputs.specs) }}
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install build tooling
+        run: dnf install -y --setopt=install_weak_deps=False mock rpm-build rpmdevtools
+      - name: Build ${{ matrix.spec }}
+        continue-on-error: true
+        run: |
+          specfile="${{ matrix.spec }}"
+          specdir=$(dirname "$specfile")
+          rpmdev-setuptree
+          if [ -d "$specdir/sources" ] ; then
+            cp "$specdir"/sources/* ~/rpmbuild/SOURCES/ 2>/dev/null || true
+          fi
+          mock --rebuild --spec="$specfile" --sources="$specdir/sources"
